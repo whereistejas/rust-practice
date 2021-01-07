@@ -1,3 +1,4 @@
+// This programs finds the number of coins and their summed up value
 // Data model {{{
 #[derive(Debug)]
 struct GenericCoin {
@@ -21,7 +22,7 @@ struct CoinJar {
 // }}}
 
 fn main() {
-    // Define types of coin {{{
+    // Set the value and quantity of each type of coin in the jar {{{
     let penny = Coins::Penny(GenericCoin {
         value: 1,
         quantity: 2,
@@ -40,7 +41,7 @@ fn main() {
     });
     // }}}
 
-    // put all the different coins into one vector
+    // put all the different types of coins into one vector
     let contents = vec![penny, nickel, dime, quarter];
 
     let mut coinjar = CoinJar {
@@ -48,6 +49,7 @@ fn main() {
         sum: 0,
     };
 
+    // find the total number of coins and the sume of their values
     for coin in &contents {
         match coin {
             Coins::Penny(_coin) => sum_and_quantity(&mut coinjar, &_coin),
@@ -61,6 +63,6 @@ fn main() {
 }
 
 fn sum_and_quantity(coinjar: &mut CoinJar, coin: &GenericCoin) {
-    coinjar.quantity = coinjar.quantity + coin.quantity;
-    coinjar.sum = coinjar.sum + (coin.quantity * coin.value);
+    coinjar.quantity = coinjar.quantity + coin.quantity; // qty_already_in_the_jar = qty_already_in_the_jar + qty_coin
+    coinjar.sum = coinjar.sum + (coin.quantity * coin.value); // existing_sum = existing_sum + (qty_coin * value_of_coin)
 }
