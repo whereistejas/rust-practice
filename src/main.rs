@@ -37,5 +37,16 @@ fn main() {
 
     book_collection.insert(2, book_2);
 
+    let book_3 = BookDetails{
+        name: "Amnesty".to_string(),
+        author: "Aravind Adiga".to_string(),
+        isbn: 123456789,
+        release_year: 2020,
+        publisher: "Random House".to_string(),
+        genres: vec!["thriller".to_string(), "fiction".to_string(), "man booker prize".to_string()],
+    };
+
+    book_collection.entry(2).or_insert( book_3);
+
     println!("{:#?}", book_collection);
 }
