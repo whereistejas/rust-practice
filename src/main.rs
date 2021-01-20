@@ -1,74 +1,43 @@
-use std::collections::hash_map::Entry;
-use std::collections::HashMap;
+extern crate argmin;
+use argmin::prelude::*;
+use argmin::solver::linesearch::HagerZhangLineSearch;
 
-#[derive(Debug)]
-struct BookDetails {
-    name: String,
-    author: String,
-    isbn: u32,
-    release_year: u16,
-    publisher: String,
-    genres: Vec<String>,
+struct cost_function {}
+
+// f(x)=(x−3) x^{3} (x−6)^{4}
+pub fn cf(x: f64) -> f64 {
+    let value: f64 = (x - 3 as f64) * x.powi(3) * (x - 6 as f64).powi(4);
+    value
 }
 
-fn main() {
-    // key-> book_id::<i32>
-    // value-> details::<bookDetails>
-    let mut book_collection = HashMap::new();
+// df(x) = (x - 6)**5 *
+// (x**3*(x - 6)*(x - 3)**(x**4)*(x + 4*(x - 3)*log(x - 3)) + 6*(x - 3)**(x**4 + 1)) /
+// (x - 3)
+pub fn cf_deriv(x: f64) -> f64 {
+    let value: f64 = (x - 6 as f64).powi(5)
+        * (x.powi(3)
+            * (x - 6 as f64)
+            * (x - 3 as f64).powf(x.powi(4))
+            * (x + 4 as f64 * (x - 3 as f64) * (x - 3 as f64).ln())
+            + 6 as f64 * (x - 3 as f64).powf(x.powi(4) + 1 as f64))
+        / (x - 3 as f64);
+    value
+}
 
-    let book_1 = BookDetails {
-        name: "The wizard of Oz".to_string(),
-        author: "Oz".to_string(),
-        isbn: 123456789,
-        release_year: 2020,
-        publisher: "Random House".to_string(),
-        genres: vec![
-            "fantasy".to_string(),
-            "magic".to_string(),
-            "wizardary".to_string(),
-        ],
-    };
+impl ArgminOp for cost_function {
+    type Param = f64;
+    type Output = f64;
+    type Float = f64;
+    type Jacobian = ();
+    type Hessian = ();
 
-    book_collection.insert(1, book_1);
-
-    let book_2 = BookDetails {
-        name: "Ikigai".to_string(),
-        author: "Generic Person".to_string(),
-        isbn: 123456789,
-        release_year: 2020,
-        publisher: "Random House".to_string(),
-        genres: vec![
-            "self-help".to_string(),
-            "life purpose".to_string(),
-            "mentality".to_string(),
-        ],
-    };
-
-    // book_collection.insert(2, book_2);
-
-    let book_3 = BookDetails {
-        name: "Amnesty".to_string(),
-        author: "Aravind Adiga".to_string(),
-        isbn: 123456789,
-        release_year: 2020,
-        publisher: "Random House".to_string(),
-        genres: vec![
-            "thriller".to_string(),
-            "fiction".to_string(),
-            "man booker prize".to_string(),
-        ],
-    };
-
-    let check_entry = book_collection.entry(2);
-    match check_entry {
-        Entry::Occupied(entry) => {
-            println!("this key {} is already occupied", entry.key())
-        }
-        Entry::Vacant(entry) => {
-            println!("this key {} is not occupied", entry.key());
-            book_collection.insert(2, book_3);
-        }
+    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
+        Ok(cf(*param))
     }
 
-    // println!("{:#?}", book_collection);
+    fn gradient(&self, param: &Self::Param) -> Result<Self::Param, Error> {
+        Ok(cf_deriv(*param))
+    }
 }
+
+fn main() {}
