@@ -40,12 +40,4 @@ impl ArgminOp for cost_function {
     }
 }
 
-fn main() {
-    let init_param: f64 = 0.0;
-    let operator = cost_function {};
-
-    let mut solver = HagerZhangLineSearch::new();
-
-    solver.set_search_direction(vec![1.0]);
-    solver.set_init_alpha(0.5);
-}
+fn main() {}
