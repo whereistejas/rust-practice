@@ -7,6 +7,6 @@ repository = "https://github.com/whereistejas/rust-practice"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-num = "*"
-argmin = "*"
+# [dependencies]
+# num = "*"
+# argmin = "*"
