@@ -6,17 +6,17 @@ fn main() {
     println!("largest: {}", largest);
 }
 
-// additions from The Rust Book
-// use of references
-//
-// peculiar observation: if we return a pointer from a function and
-// then assign it to a variable, it automatically takes the value to
-// which the reference is reffering.
+// we are adding the Copy trait here, because the generic
+// can be anything, so we have to move a heap datatype
 
-fn largest(num_list: &Vec<i64>) -> &i64 {
-    let mut largest = &num_list[0];
+fn largest<T: PartialOrd + Copy>(num_list: &Vec<T>) -> T {
+    let mut largest = num_list[0];
 
-    for num in num_list {
+    // here we are using `&num`, it doesn't mean ref of a ref; we just 
+    // directly store the ref of the item from the list. so, later in
+    // the for loop we can just use `num` as if it was derefing `&num`
+
+    for &num in num_list {
         if num > largest {
             largest = num;
         }
