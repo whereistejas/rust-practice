@@ -1,26 +1,20 @@
+use std::string::String;
+
 fn main() {
-    let num_list = vec![1, 2, 3, 9, 8, 5];
+    let str1 = String::from("Luke Skywalker");
+    let str2 = String::from("Anakin Skywalker");
+    
+    let result = longest_string(&str1, &str2);
 
-    let largest = largest(&num_list);
+    println!("longest string: {}", result);
 
-    println!("largest: {}", largest);
+    println!("string1: {}", str1);
 }
 
-// we are adding the Copy trait here, because the generic
-// can be anything, so we have to move a heap datatype
-
-fn largest<T: PartialOrd + Copy>(num_list: &Vec<T>) -> T {
-    let mut largest = num_list[0];
-
-    // here we are using `&num`, it doesn't mean ref of a ref; we just 
-    // directly store the ref of the item from the list. so, later in
-    // the for loop we can just use `num` as if it was derefing `&num`
-
-    for &num in num_list {
-        if num > largest {
-            largest = num;
-        }
+fn longest_string<'a> (str1: &'a String, str2: &'a String) -> &'a String {
+    if str1.len() > str2.len() {
+        str1
+    } else {
+        str2
     }
-
-    largest
 }
