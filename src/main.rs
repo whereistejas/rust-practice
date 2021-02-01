@@ -9,14 +9,19 @@ fn simulated_algorithm(intensity: u32) -> u32 {
 }
 
 fn generate_workout(intensity: u32, random: u32) {
+    // this is much better than the previous implementation, because we are only calliing
+    // the expensive `simulated_algorithm` only once
+    let intensity_val = simulated_algorithm(intensity);
+
     if intensity < 25 {
-        println!("do pushups {} times", simulated_algorithm(intensity));
-        println!("do situps {} times", simulated_algorithm(intensity));
+        println!("do pushups {} times", intensity_val);
+        println!("do situps {} times", intensity_val);
     } else {
         if random == 3 {
+            // but we dont need it, if this is going to be the end case
             println!("rest for a day")
         } else {
-        println!("run around for {} minutes", simulated_algorithm(intensity));
+            println!("run around for {} minutes", intensity_val);
         }
     }
 }
