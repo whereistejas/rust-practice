@@ -8,7 +8,7 @@ where
     T: Fn(u32) -> u32,
 {
     calculation: T,
-    value: Option<HashMap<u32, u32>>,
+    value: HashMap<u32, u32>,
 }
 
 impl<T> Cacher<T>
@@ -18,39 +18,20 @@ where
     pub fn new(calculation: T) -> Cacher<T> {
         Cacher {
             calculation,
-            value: None,
-        }
-    }
-    pub fn value(&mut self, arg: u32) -> u32 {
-        match self.value.unwrap().get_key_value(&arg) {
-            Some((&_K, &V)) => V,
-            None => {
-                let V = (self.calculation)(arg);
-                self.value.unwrap().insert(arg, V);
-                V
-            }
+            value: HashMap::new(),
         }
     }
 
-    // error[E0507]: cannot move out of `self.value` which is behind a mutable reference
-    //   --> src/main.rs:25:15
-    //    |
-    // 25 |         match self.value.unwrap().get_key_value(&arg) {
-    //    |               ^^^^^^^^^^
-    //    |               |
-    //    |               move occurs because `self.value` has type `Option<HashMap<u32, u32>>`, which does not implement the `Copy` trait
-    //    |               help: consider borrowing the `Option`'s content: `self.value.as_ref()`
-    // 
-    // error[E0507]: cannot move out of `self.value` which is behind a mutable reference
-    //   --> src/main.rs:29:17
-    //    |
-    // 29 |                 self.value.unwrap().insert(arg, V);
-    //    |                 ^^^^^^^^^^
-    //    |                 |
-    //    |                 move occurs because `self.value` has type `Option<HashMap<u32, u32>>`, which does not implement the `Copy` trait
-    //    |                 help: consider borrowing the `Option`'s content: `self.value.as_ref()`
-    // 
-    // error: aborting due to 2 previous errors
+    pub fn value(&mut self, arg: u32) -> u32 {
+        match self.value.get_key_value(&arg) {
+            Some((&_k, &v)) => v,
+            None => {
+                let v = (self.calculation)(arg);
+                self.value.insert(arg, v);
+                v
+            }
+        }
+    }
 
 }
 
