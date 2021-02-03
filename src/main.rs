@@ -31,6 +31,27 @@ where
             }
         }
     }
+
+    // error[E0507]: cannot move out of `self.value` which is behind a mutable reference
+    //   --> src/main.rs:25:15
+    //    |
+    // 25 |         match self.value.unwrap().get_key_value(&arg) {
+    //    |               ^^^^^^^^^^
+    //    |               |
+    //    |               move occurs because `self.value` has type `Option<HashMap<u32, u32>>`, which does not implement the `Copy` trait
+    //    |               help: consider borrowing the `Option`'s content: `self.value.as_ref()`
+    // 
+    // error[E0507]: cannot move out of `self.value` which is behind a mutable reference
+    //   --> src/main.rs:29:17
+    //    |
+    // 29 |                 self.value.unwrap().insert(arg, V);
+    //    |                 ^^^^^^^^^^
+    //    |                 |
+    //    |                 move occurs because `self.value` has type `Option<HashMap<u32, u32>>`, which does not implement the `Copy` trait
+    //    |                 help: consider borrowing the `Option`'s content: `self.value.as_ref()`
+    // 
+    // error: aborting due to 2 previous errors
+
 }
 
 fn generate_workout(intensity: u32, random: u32) {
