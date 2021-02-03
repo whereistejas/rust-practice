@@ -23,14 +23,8 @@ where
     }
 
     pub fn value(&mut self, arg: u32) -> u32 {
-        match self.value.get_key_value(&arg) {
-            Some((&_k, &v)) => v,
-            None => {
-                let v = (self.calculation)(arg);
-                self.value.insert(arg, v);
-                v
-            }
-        }
+        let v = self.value.entry(arg).or_insert((self.calculation)(arg));
+        *v
     }
 
 }
