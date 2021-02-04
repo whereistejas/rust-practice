@@ -48,10 +48,36 @@ impl Coins {
 
 #[derive(Debug)]
 struct CoinJar {
+    coinjar: Vec<Coins>,
     quantity: i32,
     sum: i32,
 }
-// }}}
+
+impl CoinJar {
+    pub fn new(coinjar: &Vec<Coins>) -> CoinJar {
+        CoinJar {
+            coinjar,
+            quantity: 0,
+            sum: 0,
+        }
+    }
+
+    pub fn get_total_qty(&mut self) -> i32 {
+        for coin in self.coinjar.iter() {
+            self.quantity = self.quantity + coin.quantity;
+        }
+
+        self.quantity
+    }
+
+    pub fn get_total_sum(&mut self) -> i32 {
+        for coin in self.coinjar.iter() {
+            self.sum = self.sum + (*coin.quantity * *coin.value);
+        }
+
+        self.sum
+    }
+}
 
 fn main() {
     // Set the value and quantity of each type of coin in the jar
@@ -63,25 +89,7 @@ fn main() {
     // put all the different types of coins into one vector
     let contents = vec![penny, nickel, dime, quarter];
 
-    let mut coinjar = CoinJar {
-        quantity: 0,
-        sum: 0,
-    };
-
-    // find the total number of coins and the sume of their values
-    for coin in &contents {
-        match coin {
-            Coins::Penny(coin) => sum_and_quantity(&mut coinjar, &coin),
-            Coins::Nickel(coin) => sum_and_quantity(&mut coinjar, &coin),
-            Coins::Dime(coin) => sum_and_quantity(&mut coinjar, &coin),
-            Coins::Quarter(coin) => sum_and_quantity(&mut coinjar, &coin),
-        }
-    }
-
-    println!("{:#?}", coinjar)
-}
-
-fn sum_and_quantity(coinjar: &mut CoinJar, coin: &GenericCoin) {
-    coinjar.quantity = coinjar.quantity + coin.quantity; // qty_already_in_the_jar = qty_already_in_the_jar + qty_coin
-    coinjar.sum = coinjar.sum + (coin.quantity * coin.value); // existing_sum = existing_sum + (qty_coin * value_of_coin)
+    let mut coinjar = CoinJar::new(&contents);
+    println!("Quantity of coins: {}", coinjar.get_total_qty());
+    println!("Sum of coins: {}", coinjar.get_total_sum());
 }

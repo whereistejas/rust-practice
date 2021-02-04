@@ -1,69 +1,81 @@
-use rand::{thread_rng, Rng};
-use std::collections::HashMap;
-use std::thread;
-use std::time::Duration;
-
-pub struct Cacher<T>
-where
-    T: Fn(u32) -> u32,
-{
-    calculation: T,
-    value: HashMap<u32, u32>,
+// This programs finds the number of coins and their summed up value
+// Data model {{{
+#[derive(Debug)]
+struct GenericCoin {
+    pub value: i32,
+    pub quantity: i32,
 }
 
-impl<T> Cacher<T>
-where
-    T: Fn(u32) -> u32,
-{
-    pub fn new(calculation: T) -> Cacher<T> {
-        Cacher {
-            calculation,
-            value: HashMap::new(),
+#[derive(Debug)]
+enum Coins {
+    Penny(GenericCoin),
+    Dime(GenericCoin),
+    Nickel(GenericCoin),
+    Quarter(GenericCoin),
+}
+
+impl Coins {
+    pub fn get_coin(coin: String, qty: i32) -> Option<Coins> {
+        let get_generic_coin = |value| {
+            GenericCoin {
+                value,
+                quantity: qty,
+            }
+        };
+
+        match coin.as_str() {
+            "Penny" => Some(Coins::Penny(get_generic_coin(1))),
+            "Nickel" => Some(Coins::Nickel(get_generic_coin(5))),
+            "Dime" => Some(Coins::Dime(get_generic_coin(10))),
+            "Quarter" => Some(Coins::Quarter(get_generic_coin(25))),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct CoinJar<'a> {
+    coins: &'a Vec<Coins>,
+    quantity: i32,
+    sum: i32,
+}
+
+impl CoinJar<'_> {
+    pub fn new(coins: &Vec<Coins>) -> CoinJar {
+        CoinJar {
+            coins,
+            quantity: 0,
+            sum: 0,
         }
     }
 
-    pub fn value(&mut self, arg: u32) -> u32 {
-        let v = self.value.entry(arg).or_insert((self.calculation)(arg));
-        *v
+    pub fn get_total_qty(&mut self) -> i32 {
+        for coin in self.coins.iter() {
+            self.quantity = self.quantity + coin.quantity;
+        }
+
+        self.quantity
     }
 
-}
-
-fn generate_workout(intensity: u32, random: u32) {
-    let mut closure = Cacher::new(|num| {
-        println!("calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
-        num
-    });
-
-    if intensity < 25 {
-        println!("do pushups {} times", closure.value(intensity));
-        println!("do situps {} times", closure.value(intensity));
-    } else {
-        if random == 3 {
-            // but we dont need it, if this is going to be the end case
-            println!("rest for a day")
-        } else {
-            println!("run around for {} minutes", closure.value(intensity));
+    pub fn get_total_sum(&mut self) -> i32 {
+        for coin in self.coins.iter() {
+            self.sum = self.sum + (coin.quantity * coin.value);
         }
+
+        self.sum
     }
 }
 
 fn main() {
-    let user_input = 50;
+    // Set the value and quantity of each type of coin in the jar
+    let penny = Coins::get_coin("Penny".to_string(), 10).unwrap();
+    let nickel = Coins::get_coin("Nickel".to_string(), 10).unwrap();
+    let dime = Coins::get_coin("Dime".to_string(), 10).unwrap();
+    let quarter = Coins::get_coin("Quarter".to_string(), 10).unwrap();
 
-    let mut generator = thread_rng();
-    let random_input = generator.gen_range(1..5);
+    // put all the different types of coins into one vector
+    let contents = vec![penny, nickel, dime, quarter];
 
-    generate_workout(user_input, random_input);
-}
-
-#[test]
-fn call_with_different_values() {
-    let mut c = Cacher::new(|a| a);
-
-    let _v1 = c.value(1);
-    let v2 = c.value(2);
-
-    assert_eq!(v2, 2);
+    let mut coinjar = CoinJar::new(&contents);
+    println!("Quantity of coins: {}", coinjar.get_total_qty());
+    println!("Sum of coins: {}", coinjar.get_total_sum());
 }
