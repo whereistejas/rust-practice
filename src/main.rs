@@ -63,6 +63,26 @@ impl CoinJar<'_> {
 
         self.sum
     }
+
+    // error[E0609]: no field `quantity` on type `&Coins`
+    //   --> src/main.rs:53:50
+    //    |
+    // 53 |             self.quantity = self.quantity + coin.quantity;
+    //    |                                                  ^^^^^^^^
+    // 
+    // error[E0609]: no field `quantity` on type `&Coins`
+    //   --> src/main.rs:61:41
+    //    |
+    // 61 |             self.sum = self.sum + (coin.quantity * coin.value);
+    //    |                                         ^^^^^^^^
+    // 
+    // error[E0609]: no field `value` on type `&Coins`
+    //   --> src/main.rs:61:57
+    //    |
+    // 61 |             self.sum = self.sum + (coin.quantity * coin.value);
+    //    |                                                         ^^^^^
+    // 
+    // error: aborting due to 3 previous errors
 }
 
 fn main() {
