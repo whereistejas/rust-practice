@@ -34,14 +34,14 @@ impl Coins {
 }
 
 #[derive(Debug)]
-struct CoinJar<'a> {
-    coins: &'a Vec<Coins>,
+struct CoinJar {
+    coins: Vec<Coins>,
     quantity: i32,
     sum: i32,
 }
 
-impl CoinJar<'_> {
-    pub fn new(coins: &Vec<Coins>) -> CoinJar {
+impl CoinJar {
+    pub fn new(coins: Vec<Coins>) -> CoinJar {
         CoinJar {
             coins,
             quantity: 0,
@@ -76,7 +76,13 @@ impl CoinJar<'_> {
 }
 
 fn main() {
-    // Set the value and quantity of each type of coin in the jar
+    let mut coinjar = prepare_cut();
+    println!("Quantity of coins: {}", coinjar.get_total_qty());
+    println!("Sum of coins: {}", coinjar.get_total_sum());
+}
+
+// prepare code under test
+fn prepare_cut() -> CoinJar {
     let penny = Coins::get_coin("Penny".to_string(), 10).unwrap();
     let nickel = Coins::get_coin("Nickel".to_string(), 10).unwrap();
     let dime = Coins::get_coin("Dime".to_string(), 10).unwrap();
@@ -85,7 +91,17 @@ fn main() {
     // put all the different types of coins into one vector
     let contents = vec![penny, nickel, dime, quarter];
 
-    let mut coinjar = CoinJar::new(&contents);
-    println!("Quantity of coins: {}", coinjar.get_total_qty());
-    println!("Sum of coins: {}", coinjar.get_total_sum());
+    CoinJar::new(contents)
+}
+
+#[test]
+fn check_sum() {
+    let mut coinjar = prepare_cut();
+    assert_eq!(40, coinjar.get_total_qty());
+}
+
+#[test]
+fn check_qty() {
+    let mut coinjar = prepare_cut();
+    assert_eq!(410, coinjar.get_total_sum());
 }
