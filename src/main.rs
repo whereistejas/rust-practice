@@ -1,51 +1,69 @@
-extern crate argmin;
-use argmin::prelude::*;
-use argmin::solver::linesearch::HagerZhangLineSearch;
+use rand::{thread_rng, Rng};
+use std::collections::HashMap;
+use std::thread;
+use std::time::Duration;
 
-struct cost_function {}
-
-// f(x)=(x−3) x^{3} (x−6)^{4}
-pub fn cf(x: f64) -> f64 {
-    let value: f64 = (x - 3 as f64) * x.powi(3) * (x - 6 as f64).powi(4);
-    value
+pub struct Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    calculation: T,
+    value: HashMap<u32, u32>,
 }
 
-// df(x) = (x - 6)**5 *
-// (x**3*(x - 6)*(x - 3)**(x**4)*(x + 4*(x - 3)*log(x - 3)) + 6*(x - 3)**(x**4 + 1)) /
-// (x - 3)
-pub fn cf_deriv(x: f64) -> f64 {
-    let value: f64 = (x - 6 as f64).powi(5)
-        * (x.powi(3)
-            * (x - 6 as f64)
-            * (x - 3 as f64).powf(x.powi(4))
-            * (x + 4 as f64 * (x - 3 as f64) * (x - 3 as f64).ln())
-            + 6 as f64 * (x - 3 as f64).powf(x.powi(4) + 1 as f64))
-        / (x - 3 as f64);
-    value
-}
-
-impl ArgminOp for cost_function {
-    type Param = f64;
-    type Output = f64;
-    type Float = f64;
-    type Jacobian = ();
-    type Hessian = ();
-
-    fn apply(&self, param: &Self::Param) -> Result<Self::Output, Error> {
-        Ok(cf(*param))
+impl<T> Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    pub fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: HashMap::new(),
+        }
     }
 
-    fn gradient(&self, param: &Self::Param) -> Result<Self::Param, Error> {
-        Ok(cf_deriv(*param))
+    pub fn value(&mut self, arg: u32) -> u32 {
+        let v = self.value.entry(arg).or_insert((self.calculation)(arg));
+        *v
+    }
+
+}
+
+fn generate_workout(intensity: u32, random: u32) {
+    let mut closure = Cacher::new(|num| {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    });
+
+    if intensity < 25 {
+        println!("do pushups {} times", closure.value(intensity));
+        println!("do situps {} times", closure.value(intensity));
+    } else {
+        if random == 3 {
+            // but we dont need it, if this is going to be the end case
+            println!("rest for a day")
+        } else {
+            println!("run around for {} minutes", closure.value(intensity));
+        }
     }
 }
 
 fn main() {
-    let init_param: f64 = 0.0;
-    let operator = cost_function {};
+    let user_input = 50;
 
-    let mut solver = HagerZhangLineSearch::new();
+    let mut generator = thread_rng();
+    let random_input = generator.gen_range(1..5);
 
-    solver.set_search_direction(vec![1.0]);
-    solver.set_init_alpha(0.5);
+    generate_workout(user_input, random_input);
+}
+
+#[test]
+fn call_with_different_values() {
+    let mut c = Cacher::new(|a| a);
+
+    let _v1 = c.value(1);
+    let v2 = c.value(2);
+
+    assert_eq!(v2, 2);
 }
