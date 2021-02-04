@@ -2,8 +2,8 @@
 // Data model {{{
 #[derive(Debug)]
 struct GenericCoin {
-    value: i32,
-    quantity: i32,
+    pub value: i32,
+    pub quantity: i32,
 }
 
 #[derive(Debug)]
@@ -16,63 +16,59 @@ enum Coins {
 
 impl Coins {
     pub fn get_coin(coin: String, qty: i32) -> Option<Coins> {
+        let get_generic_coin = |value| {
+            GenericCoin {
+                value,
+                quantity: qty,
+            }
+        };
+
         match coin.as_str() {
-            "Penny" => {
-                return Some(Coins::Penny(GenericCoin {
-                    value: 1,
-                    quantity: qty,
-                }));
-            }
-            "Nickel" => {
-                return Some(Coins::Nickel(GenericCoin {
-                    value: 5,
-                    quantity: qty,
-                }))
-            }
-            "Dime" => {
-                return Some(Coins::Dime(GenericCoin {
-                    value: 10,
-                    quantity: qty,
-                }))
-            }
-            "Quarter" => {
-                return Some(Coins::Quarter(GenericCoin {
-                    value: 25,
-                    quantity: qty,
-                }))
-            }
-            _ => return None,
+            "Penny" => Some(Coins::Penny(get_generic_coin(1))),
+            "Nickel" => Some(Coins::Nickel(get_generic_coin(5))),
+            "Dime" => Some(Coins::Dime(get_generic_coin(10))),
+            "Quarter" => Some(Coins::Quarter(get_generic_coin(25))),
+            _ => None,
         }
     }
 }
 
 #[derive(Debug)]
-struct CoinJar {
-    coinjar: Vec<Coins>,
+struct CoinJar<'a> {
+    coins: &'a Vec<Coins>,
     quantity: i32,
     sum: i32,
 }
 
-impl CoinJar {
-    pub fn new(coinjar: &Vec<Coins>) -> CoinJar {
+impl CoinJar<'_> {
+    pub fn new(coins: &Vec<Coins>) -> CoinJar {
         CoinJar {
-            coinjar,
+            coins,
             quantity: 0,
             sum: 0,
         }
     }
 
+    fn match_coin(coin: &Coins) -> &GenericCoin {
+        match coin {
+            Coins::Penny(gc) => gc,
+            Coins::Dime(gc) => gc,
+            Coins::Nickel(gc) => gc,
+            Coins::Quarter(gc) => gc,
+        }
+    }
+
     pub fn get_total_qty(&mut self) -> i32 {
-        for coin in self.coinjar.iter() {
-            self.quantity = self.quantity + coin.quantity;
+        for coin in self.coins.iter() {
+            self.quantity = self.quantity + Self::match_coin(coin).quantity;
         }
 
         self.quantity
     }
 
     pub fn get_total_sum(&mut self) -> i32 {
-        for coin in self.coinjar.iter() {
-            self.sum = self.sum + (*coin.quantity * *coin.value);
+        for coin in self.coins.iter() {
+            self.sum = self.sum + (Self::match_coin(coin).quantity * Self::match_coin(coin).value);
         }
 
         self.sum
