@@ -89,3 +89,22 @@ fn main() {
     println!("Quantity of coins: {}", coinjar.get_total_qty());
     println!("Sum of coins: {}", coinjar.get_total_sum());
 }
+
+// @whereistejas in your specific case, you might have wanted a more orthogonal design for Coins, since all the variants actually share the same data
+// You could have done something like
+// ```rust
+// enum CoinKind {
+//     Penny,
+//     Dime,
+//     Nickel,
+//     Quarter,
+// }
+// ```
+// and you'd then have
+// ```rust
+// struct Coin {
+//     value: i32,
+//     quantity: i32,
+//     kind: CoinKind
+// }
+// ```
