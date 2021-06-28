@@ -29,34 +29,26 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
     let mut result = Vec::new();
 
     // implementation using iterators
-    let mut iter1 = first_half.into_iter();
-    let mut iter2 = second_half.into_iter();
-
-    let mut next_x = iter1.next();
-    let mut next_y = iter2.next();
+    let mut iter1 = first_half.into_iter().peekable();
+    let mut iter2 = second_half.into_iter().peekable();
 
     loop {
-        match (next_x, next_y) {
+        match (iter1.peek(), iter2.peek()) {
             (Some(x), Some(y)) => {
-                if x < y {
-                    result.push(x);
-                    next_x = iter1.next();
+                if *x < *y {
+                    result.push(iter1.next().unwrap());
                 } else {
-                    result.push(y);
-                    next_y = iter2.next();
+                    result.push(iter2.next().unwrap());
                 }
             }
-            (Some(x), None) => {
-                result.push(x);
+            (.., None) => {
                 result.extend(iter1);
                 break;
             }
-            (None, Some(y)) => {
-                result.push(y);
+            (None, ..) => {
                 result.extend(iter2);
                 break;
             }
-            _ => break,
         }
     }
 
