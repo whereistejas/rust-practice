@@ -18,9 +18,9 @@ pub fn merge_sort(mut list: Vec<i32>) -> Vec<i32> {
         let first_half = merge_sort((&list[0..(len / 2)]).to_vec());
         let second_half = merge_sort((&list[(len / 2)..]).to_vec());
 
-        list = merge(first_half, second_half)
+        // merge the two lists
+        list = merge(first_half, second_half);
     }
-    dbg!(&list);
 
     list
 }
@@ -29,12 +29,19 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
     let mut result = Vec::new();
 
     // implementation using iterators
+    // using peekable, we can look into the next element without actually consuming it
+    // ref: https://doc.rust-lang.org/std/iter/struct.Peekable.html
     let mut iter1 = first_half.into_iter().peekable();
     let mut iter2 = second_half.into_iter().peekable();
 
+    // using a single loop
     loop {
+        // we will only consume one of the two iterators in each iteration
+        // thus, once we consume all the elements in one iterator, we will still be left with some
+        // remaining elements in the other iterator
         match (iter1.peek(), iter2.peek()) {
             (Some(x), Some(y)) => {
+                // compare the two values and push the smaller one
                 if *x < *y {
                     result.push(iter1.next().unwrap());
                 } else {
@@ -42,10 +49,12 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
                 }
             }
             (.., None) => {
+                // consume the remaining elements in first_half
                 result.extend(iter1);
                 break;
             }
             (None, ..) => {
+                // consume the remaining elements in second_half 
                 result.extend(iter2);
                 break;
             }
