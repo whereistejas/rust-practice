@@ -29,59 +29,36 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
     let mut result = Vec::new();
 
     // implementation using iterators
-    let mut iter1 = first_half.iter().peekable();
-    let mut iter2 = second_half.iter().peekable();
+    let mut iter1 = first_half.into_iter();
+    let mut iter2 = second_half.into_iter();
+
+    let mut next_x = iter1.next();
+    let mut next_y = iter2.next();
 
     loop {
-        match (iter1.peek(), iter2.peek()) {
+        match (next_x, next_y) {
             (Some(x), Some(y)) => {
-                if *x < *y {
-                    result.push(*iter1.next().unwrap());
+                if x < y {
+                    result.push(x);
+                    next_x = iter1.next();
                 } else {
-                    result.push(*iter2.next().unwrap());
+                    result.push(y);
+                    next_y = iter2.next();
                 }
+            }
+            (Some(x), None) => {
+                result.push(x);
+                result.extend(iter1);
+                break;
+            }
+            (None, Some(y)) => {
+                result.push(y);
+                result.extend(iter2);
+                break;
             }
             _ => break,
         }
     }
-
-    loop {
-        match iter1.next() {
-            Some(x) => result.push(*x),
-            None => break,
-        }
-    }
-
-    loop {
-        match iter2.next() {
-            Some(y) => result.push(*y),
-            None => break,
-        }
-    }
-
-    // implementation using slices and indices
-    // let mut i: usize = 0;
-    // let mut j: usize = 0;
-
-    // while i < first_half.len() && j < second_half.len() {
-    //     if first_half[i] < second_half[j] {
-    //         result.push(first_half[i]);
-    //         i += 1;
-    //     } else {
-    //         result.push(second_half[j]);
-    //         j += 1;
-    //     }
-    // }
-
-    // while i < first_half.len() {
-    //     result.push(first_half[i]);
-    //     i += 1;
-    // }
-
-    // while j < second_half.len() {
-    //     result.push(second_half[j]);
-    //     j += 1;
-    // }
 
     result
 }
