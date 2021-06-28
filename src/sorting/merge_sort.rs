@@ -28,28 +28,60 @@ pub fn merge_sort(mut list: Vec<i32>) -> Vec<i32> {
 fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
     let mut result = Vec::new();
 
-    let mut i: usize = 0;
-    let mut j: usize = 0;
+    // implementation using iterators
+    let mut iter1 = first_half.iter().peekable();
+    let mut iter2 = second_half.iter().peekable();
 
-    while i < first_half.len() && j < second_half.len() {
-        if first_half[i] < second_half[j] {
-            result.push(first_half[i]);
-            i += 1;
-        } else {
-            result.push(second_half[j]);
-            j += 1;
+    loop {
+        match (iter1.peek(), iter2.peek()) {
+            (Some(x), Some(y)) => {
+                if *x < *y {
+                    result.push(*iter1.next().unwrap());
+                } else {
+                    result.push(*iter2.next().unwrap());
+                }
+            }
+            _ => break,
         }
     }
 
-    while i < first_half.len() {
-        result.push(first_half[i]);
-        i += 1;
+    loop {
+        match iter1.next() {
+            Some(x) => result.push(*x),
+            None => break,
+        }
     }
 
-    while j < second_half.len() {
-        result.push(second_half[j]);
-        j += 1;
+    loop {
+        match iter2.next() {
+            Some(y) => result.push(*y),
+            None => break,
+        }
     }
+
+    // implementation using slices and indices
+    // let mut i: usize = 0;
+    // let mut j: usize = 0;
+
+    // while i < first_half.len() && j < second_half.len() {
+    //     if first_half[i] < second_half[j] {
+    //         result.push(first_half[i]);
+    //         i += 1;
+    //     } else {
+    //         result.push(second_half[j]);
+    //         j += 1;
+    //     }
+    // }
+
+    // while i < first_half.len() {
+    //     result.push(first_half[i]);
+    //     i += 1;
+    // }
+
+    // while j < second_half.len() {
+    //     result.push(second_half[j]);
+    //     j += 1;
+    // }
 
     result
 }
