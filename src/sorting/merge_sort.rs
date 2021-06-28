@@ -34,32 +34,17 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
     let mut iter1 = first_half.into_iter().peekable();
     let mut iter2 = second_half.into_iter().peekable();
 
-    // using a single loop
-    loop {
-        // we will only consume one of the two iterators in each iteration
-        // thus, once we consume all the elements in one iterator, we will still be left with some
-        // remaining elements in the other iterator
-        match (iter1.peek(), iter2.peek()) {
-            (Some(x), Some(y)) => {
-                // compare the two values and push the smaller one
-                if *x < *y {
-                    result.push(iter1.next().unwrap());
-                } else {
-                    result.push(iter2.next().unwrap());
-                }
-            }
-            (.., None) => {
-                // consume the remaining elements in first_half
-                result.extend(iter1);
-                break;
-            }
-            (None, ..) => {
-                // consume the remaining elements in second_half 
-                result.extend(iter2);
-                break;
-            }
+    // use while...let instead of loop...match
+    while let (Some(x), Some(y)) = (iter1.peek(), iter2.peek()) {
+        if x < y {
+            result.push(iter1.next().unwrap());
+        } else {
+            result.push(iter2.next().unwrap());
         }
     }
+
+    result.extend(iter1);
+    result.extend(iter2);
 
     result
 }
