@@ -1,6 +1,3 @@
-/// reference: https://www.khanacademy.org/computing/computer-science/algorithms/merge-sort/a/overview-of-merge-sort
-/// reference: https://github.com/pedrovgs/Algorithms/blob/master/src/main/java/com/github/pedrovgs/problem79/MergeSort.java
-
 pub fn merge_sort(mut list: Vec<i32>) -> Vec<i32> {
     // check if we have a base case
     if list.len() <= 2 {
@@ -11,15 +8,14 @@ pub fn merge_sort(mut list: Vec<i32>) -> Vec<i32> {
             }
         }
     } else {
-        // get the list length
-        let len = list.len();
-
         // cut the list in two halves
-        let first_half = merge_sort((&list[0..(len / 2)]).to_vec());
-        let second_half = merge_sort((&list[(len / 2)..]).to_vec());
+        let (first_half, second_half) = list.split_at(list.len() / 2);
 
         // merge the two lists
-        list = merge(first_half, second_half);
+        list = merge(
+            merge_sort(first_half.to_vec()),
+            merge_sort(second_half.to_vec()),
+        );
     }
 
     list
@@ -36,7 +32,7 @@ fn merge(first_half: Vec<i32>, second_half: Vec<i32>) -> Vec<i32> {
 
     // use while...let instead of loop...match
     while let (Some(x), Some(y)) = (iter1.peek(), iter2.peek()) {
-        if x < y {
+        if *x < *y {
             result.push(iter1.next().unwrap());
         } else {
             result.push(iter2.next().unwrap());
