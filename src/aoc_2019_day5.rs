@@ -16,8 +16,8 @@ enum Parameter {
 enum Ops {
     Add(i32, i32),
     Multiply(i32, i32),
-    Insert,
-    Output,
+    Insert(i32),
+    Output(i32),
     Halt,
 }
 
@@ -47,13 +47,12 @@ impl Machine {
                     self.memory[loc as usize] = result;
                     self.pc += 4;
                 }
-                Ops::Insert => {
+                Ops::Insert(p1) => {
                     let loc = self.memory[self.pc + 1];
-                    self.memory[loc as usize] = self.input.remove(0);
+                    self.memory[loc as usize] = p1;
                     self.pc += 2;
                 }
-                Ops::Output => {
-                    let p1 = self.get_param(1);
+                Ops::Output(p1) => {
                     self.output.push(p1);
                     self.pc += 2;
                 }
@@ -62,13 +61,13 @@ impl Machine {
         }
     }
 
-    fn get_ops(&self) -> Option<Ops> {
+    fn get_ops(&mut self) -> Option<Ops> {
         let ops_raw = self.memory[self.pc] % 100;
         let ops = match ops_raw {
             1 => Ops::Add(self.get_param(1), self.get_param(2)),
             2 => Ops::Multiply(self.get_param(1), self.get_param(2)),
-            3 => Ops::Insert,
-            4 => Ops::Output,
+            3 => Ops::Insert(self.input.remove(0)),
+            4 => Ops::Output(self.get_param(1)),
             99 => Ops::Halt,
             _ => panic!("incorrect ops type"),
         };
@@ -95,6 +94,7 @@ impl Machine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_new() {
         let input = vec![1101, 100, -1, 4, 0];
