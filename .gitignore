@@ -1,3 +1,5 @@
+.gitignore
 target/
 .ipynb_checkpoints/
 .git/
+.vscode/

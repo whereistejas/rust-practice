@@ -2,7 +2,7 @@
 pub struct Machine {
     pc: usize,
     memory: Vec<i32>,
-    output: Vec<i32>,
+    pub output: Vec<i32>,
     input: Vec<i32>,
 }
 
@@ -101,7 +101,6 @@ impl Machine {
             99 => Ops::Halt,
             _ => panic!("incorrect ops type"),
         };
-        dbg!(&ops);
         Some(ops)
     }
 
@@ -116,7 +115,7 @@ impl Machine {
     fn get_param(&self, nth: usize) -> i32 {
         let pmode = self.get_pmode(nth);
         return match pmode {
-            Parameter::Position => self.memory[dbg!(self.memory[self.pc + nth]) as usize],
+            Parameter::Position => self.memory[self.memory[self.pc + nth] as usize],
             Parameter::Immediate => self.memory[self.pc + nth],
         };
     }
